@@ -1,0 +1,47 @@
+# Environment variables
+.env
+.env.*
+!.env.template
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Poetry
+poetry.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Sample documents
+examples/sample_documents/*
+!examples/sample_documents/README.md
+
+# Analysis output
+examples/sample_documents/*.txt
+examples/sample_documents/*_annotated.pdf 

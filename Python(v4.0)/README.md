@@ -26,10 +26,83 @@ Azure AI Document Intelligence is a cloud-based [Azure AI service](https://learn
 ## **Prerequisites**
 * Azure subscription - [Create one for free](https://azure.microsoft.com/free/ai-services/).
 * [Python 3.8 or later](https://www.python.org/). Your Python installation should include [pip](https://pip.pypa.io/en/stable/). You can check if you have pip installed by running `pip --version` on the command line. Get pip by installing the latest version of Python.
+* [Poetry](https://python-poetry.org/) for dependency management
 * Install the latest version of [Visual Studio Code](https://code.visualstudio.com/) or your preferred IDE. For more information, see [Getting Started with Python in Visual Studio Code](https://code.visualstudio.com/docs/python/python-tutorial).
 * An Azure AI services or Document Intelligence resource. Once you have your Azure subscription, Create a [single-service](https://aka.ms/single-service) or [multi-service](https://aka.ms/multi-service) resource.
     You can use the free pricing tier (F0) to try the service and upgrade to a paid tier for production later.
 * [Get endpoint and keys](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/create-document-intelligence-resource?view=doc-intel-4.0.0#get-endpoint-url-and-keys) to your Document Intelligence resource.
+
+## **Project Structure**
+
+```
+document-intelligence-code-samples/
+├── my_project/
+│   ├── __init__.py
+│   ├── models/
+│   │   ├── read_model/
+│   │   ├── layout_model/
+│   │   ├── prebuilt_model/
+│   │   └── custom_model/
+│   ├── add_on_capabilities/
+│   └── utils/
+├── tests/
+│   └── test_my_project.py
+├── pyproject.toml
+├── poetry.lock
+└── README.md
+```
+
+## **Development Setup**
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd document-intelligence-code-samples
+```
+
+2. Install Poetry (if not already installed):
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+3. Install dependencies:
+```bash
+poetry install
+```
+
+4. Activate the virtual environment:
+```bash
+poetry shell
+```
+
+5. Set up environment variables:
+```bash
+export AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT="your-endpoint"
+export AZURE_DOCUMENT_INTELLIGENCE_KEY="your-key"
+```
+
+## **Running Tests**
+
+1. Run all tests (excluding integration tests):
+```bash
+poetry run pytest --cov=my_project --cov-report=term-missing
+```
+
+2. Run integration tests (requires valid Azure credentials):
+```bash
+poetry run pytest -m integration --cov=my_project --cov-report=term-missing
+```
+
+3. Run specific test files:
+```bash
+poetry run pytest tests/test_azure_client.py --cov=my_project --cov-report=term-missing
+```
+
+4. Generate HTML coverage report:
+```bash
+poetry run pytest --cov=my_project --cov-report=html
+```
+The HTML report will be available in the `htmlcov` directory.
 
 ## **Setup**
 
@@ -136,6 +209,222 @@ what you can do with the Azure Document Intelligence client library.
 [get-endpoint-instructions]: https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/documentintelligence/azure-ai-documentintelligence/README.md#get-the-endpoint
 [get-key-instructions]: https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/documentintelligence/azure-ai-documentintelligence/README.md#get-the-api-key
 [changelog]: https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/documentintelligence/azure-ai-documentintelligence/CHANGELOG.md
+
+## **Contributing**
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Install development dependencies:
+```bash
+poetry install --with dev
+```
+4. Run tests to ensure everything works:
+```bash
+poetry run pytest
+```
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## **Managing Dependencies**
+
+- Add a new production dependency:
+```bash
+poetry add package-name
+```
+
+- Add a new development dependency:
+```bash
+poetry add --group dev package-name
+```
+
+- Update dependencies:
+```bash
+poetry update
+```
+
+## **Environment Setup**
+
+1. Copy the environment template file:
+```bash
+cp .env.template .env
+```
+
+2. Edit the `.env` file with your credentials:
+```env
+AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=your-endpoint-here
+AZURE_DOCUMENT_INTELLIGENCE_KEY=your-key-here
+DEBUG=False
+```
+
+> [!IMPORTANT]
+> Never commit your `.env` file to version control. It's already included in `.gitignore`.
+
+## Verifying Azure Credentials
+
+The project includes a utility function to verify your Azure credentials:
+
+```python
+from my_project import test_azure_credentials
+
+success, message = test_azure_credentials()
+if success:
+    print("Azure credentials are valid!")
+else:
+    print(f"Error: {message}")
+```
+
+You can also enable automatic credential verification on startup by setting `DEBUG=True` in your `.env` file.
+
+## Running Tests
+
+1. Run all tests (excluding integration tests):
+```bash
+poetry run pytest --cov=my_project --cov-report=term-missing
+```
+
+2. Run integration tests (requires valid Azure credentials):
+```bash
+poetry run pytest -m integration --cov=my_project --cov-report=term-missing
+```
+
+3. Run specific test files:
+```bash
+poetry run pytest tests/test_azure_client.py --cov=my_project --cov-report=term-missing
+```
+
+4. Generate HTML coverage report:
+```bash
+poetry run pytest --cov=my_project --cov-report=html
+```
+The HTML report will be available in the `htmlcov` directory.
+
+## Document Layout Analysis
+
+The project includes a `LayoutAnalyzer` class for analyzing document layouts using Azure Document Intelligence. This analyzer can extract and analyze text, tables, paragraphs, and other document elements.
+
+### Basic Usage
+
+```python
+from my_project.models.layout_analyzer import LayoutAnalyzer
+
+# Initialize analyzer using environment variables
+analyzer = LayoutAnalyzer()
+
+# Or initialize with explicit credentials
+analyzer = LayoutAnalyzer(
+    endpoint="your-endpoint-here",
+    key="your-key-here"
+)
+
+# Analyze a document and print results
+analyzer.analyze_and_print_results("path/to/your/document.pdf")
+
+# Get analysis results without printing
+result = analyzer.analyze_document("path/to/your/document.pdf")
+```
+
+### Features
+
+The LayoutAnalyzer can detect and analyze:
+- Handwritten content
+- Page dimensions and layout
+- Text lines and words with confidence scores
+- Selection marks (checkboxes, radio buttons)
+- Paragraphs with their roles and positions
+- Tables with cell content and positions
+- Bounding polygons for all elements
+
+### Visualization
+
+The project includes a visualization tool that can create annotated PDFs showing the detected elements:
+
+```bash
+# First analyze the document
+poetry run python examples/test_layout_analysis.py
+
+# Then create the visualization
+poetry run python examples/visualize_analysis.py sample
+```
+
+The visualizer will create an annotated PDF with red overlays showing all detected elements:
+- Words
+- Lines
+- Paragraphs
+- Tables
+- Table cells
+- Selection marks
+
+### Example Output
+
+```
+Document contains handwritten content
+
+----Analyzing layout from page #1----
+Page has width: 8.5 and height: 11.0, measured with unit: inch
+
+...Line #0 has word count 5 and text 'Sample document text here'
+......Word 'Sample' has a confidence of 0.989
+......Word 'document' has a confidence of 0.995
+[...]
+
+----Detected #3 paragraphs----
+Found paragraph with role: 'title' within
+Page #1: [1.0, 1.0], [7.5, 1.0] bounding region
+...with content: 'Document Title'
+
+----Analyzing tables----
+Table #0 has 3 rows and 2 columns
+...Cell[0][0] has text 'Header 1'
+...Cell[0][1] has text 'Header 2'
+[...]
+```
+
+### Project Structure
+
+```
+document-intelligence-samples/
+├── my_project/
+│   ├── models/
+│   │   └── layout_analyzer.py    # Document layout analysis
+│   └── utils/
+│       └── azure_client.py       # Azure credential testing
+├── tests/
+│   ├── test_layout_analyzer.py   # Layout analyzer tests
+│   └── test_azure_client.py      # Credential tests
+└── [other files...]
+```
+
+### Setup for Layout Analysis
+
+1. Ensure you have the required dependencies:
+```bash
+poetry install
+```
+
+2. Set up your Azure credentials in `.env`:
+```env
+AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=your-endpoint-here
+AZURE_DOCUMENT_INTELLIGENCE_KEY=your-key-here
+```
+
+3. Run the example script:
+```bash
+# First, place a sample PDF in examples/sample_documents/sample.pdf
+poetry run python examples/test_layout_analysis.py
+```
+
+The script will:
+- Verify your Azure credentials
+- Initialize the layout analyzer
+- Analyze the sample document
+- Print detailed results
+
+Example usage with your own script:
+```python
+from my_project.models.layout_analyzer import LayoutAnalyzer
+from my_project.utils.azure_client import test_azure_credentials
+```
 
 
 
